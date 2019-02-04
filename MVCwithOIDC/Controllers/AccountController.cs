@@ -293,11 +293,9 @@ namespace MVCwithOIDC.Controllers {
       var detailedLoginInfo = await AuthenticationManager.AuthenticateAsync(DefaultAuthenticationTypes.ApplicationCookie);
       var identityInfo = await AuthenticationManager.GetExternalIdentityAsync(DefaultAuthenticationTypes.ApplicationCookie);
 
-      AuthenticationManager.SignOut();
+      //AuthenticationManager.SignOut();
 
       var claimsIdentity = detailedLoginInfo.Identity;
-
-      //claimsIdentity2.AddClaims(claimsIdentity1.Claims);
 
       var membershipName = string.Empty;
       switch (claimsIdentity.GetUserId()) {
@@ -312,8 +310,8 @@ namespace MVCwithOIDC.Controllers {
       AuthenticationManager.SignIn(new AuthenticationProperties { IsPersistent = true }, claimsIdentity);
 
       if (loginInfo == null) {
-        //var redirect = RedirectToAction("Index", "Home");
-        var redirect = RedirectToLocal(returnUrl); 
+        var redirect = RedirectToAction("Index", "Home");
+        //var redirect = RedirectToLocal(returnUrl); 
         return redirect;
         //return RedirectToAction("Login");
       }
