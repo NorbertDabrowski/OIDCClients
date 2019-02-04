@@ -12,9 +12,9 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
-using MVCwithOIDC.Models;
+using MVCwithAAD.Models;
 
-namespace MVCwithOIDC.Controllers {
+namespace MVCwithAAD.Controllers {
   [Authorize]
   public class AccountController : Controller {
     private ApplicationSignInManager _signInManager;

@@ -10,9 +10,9 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
-using MVCwithOIDC.Models;
+using MVCwithAAD.Models;
 
-namespace MVCwithOIDC
+namespace MVCwithAAD
 {
     public class EmailService : IIdentityMessageService
     {

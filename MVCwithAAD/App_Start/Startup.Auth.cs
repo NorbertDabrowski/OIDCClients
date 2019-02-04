@@ -6,7 +6,7 @@ using Owin;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace MVCwithOIDC {
+namespace MVCwithAAD {
   public partial class Startup {
     public void ConfigureAuth(IAppBuilder app) {
 
@@ -16,7 +16,7 @@ namespace MVCwithOIDC {
 
       app.UseCookieAuthentication(new CookieAuthenticationOptions {
         AuthenticationType = cookieType,
-        CookieName = "MVCcookieOIDC"
+        CookieName = "MVCcookieOIDaad"
       });
 
       // HYBRID
@@ -25,10 +25,10 @@ namespace MVCwithOIDC {
 
         Authority = "https://localhost:44334",
         RequireHttpsMetadata = false,
-        RedirectUri = "http://localhost:58917/signin-oidc",
-        PostLogoutRedirectUri = "http://localhost:58917/signout-callback-oidc",
+        RedirectUri = "http://localhost:58927/signin-oidc",
+        PostLogoutRedirectUri = "http://localhost:58927/signout-callback-oidc",
 
-        ClientId = "mvc4net.hybrid",
+        ClientId = "mvc4netaad.hybrid",
         ClientSecret = "secret",
                 
         ResponseType = OpenIdConnectResponseType.CodeIdToken, //"code id_token"
@@ -60,7 +60,7 @@ namespace MVCwithOIDC {
       //  ClientSecret = "secret",
       //  ResponseType = "id_token",
       //  SignInAsAuthenticationType = cookieType,
-      //  RedirectUri = "http://localhost:58917/signin-oidc",
+      //  RedirectUri = "http://localhost:58927/signin-oidc",
       //  Scope = "openid"
       //});
     }

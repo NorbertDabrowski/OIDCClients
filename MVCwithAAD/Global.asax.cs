@@ -8,7 +8,7 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 
-namespace MVCwithOIDC {
+namespace MVCwithAAD {
   public class MvcApplication : System.Web.HttpApplication {
     protected void Application_Start() {
       AreaRegistration.RegisterAllAreas();
