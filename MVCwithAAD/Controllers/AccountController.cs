@@ -245,7 +245,6 @@ namespace MVCwithOIDC.Controllers {
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
     public ActionResult ExternalLogin(string provider, string returnUrl) {
-
       // Request a redirect to the external login provider
       return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl }));
     }
@@ -290,8 +289,6 @@ namespace MVCwithOIDC.Controllers {
       var detailedLoginInfo = await AuthenticationManager.AuthenticateAsync(DefaultAuthenticationTypes.ApplicationCookie);
       var identityInfo = await AuthenticationManager.GetExternalIdentityAsync(DefaultAuthenticationTypes.ApplicationCookie);
 
-      //AuthenticationManager.SignOut();
-
       var claimsIdentity = detailedLoginInfo.Identity;
 
       var membershipName = string.Empty;
@@ -308,9 +305,7 @@ namespace MVCwithOIDC.Controllers {
 
       if (loginInfo == null) {
         var redirect = RedirectToAction("Index", "Home");
-        //var redirect = RedirectToLocal(returnUrl); 
         return redirect;
-        //return RedirectToAction("Login");
       }
 
       // Sign in the user with this external login provider if the user already has a login
@@ -371,28 +366,10 @@ namespace MVCwithOIDC.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public ActionResult LogOff() {
-
       AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
-      //AuthenticationManager.SignOut();
       HttpContext.User = new GenericPrincipal(new GenericIdentity(string.Empty), null);
 
-      //List<string> keys = new List<string>();
-      //foreach (string cookieKey in Request.Cookies.Keys) {
-      //  keys.Add(cookieKey);
-      //}
-      //foreach (string cookieKey in keys) {
-      //  Request.Cookies[cookieKey].Expires = DateTime.Now.AddDays(-1d);
-      //  Response.Cookies.Remove(Request.Cookies[cookieKey].Name);
-      //}
-      if (HttpContext.User != null) {
-      }
-
       return Redirect("https://localhost:44334/connect/endsession");
-
-      //var client = new System.Net.Http.HttpClient();
-      //var g = client.PostAsync("https://localhost:44334/connect/endsession", null).Result;
-      
-      //return RedirectToAction("Index", "Home");
     }
 
     //
