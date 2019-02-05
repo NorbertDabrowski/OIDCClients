@@ -1,69 +1,62 @@
-﻿using Microsoft.AspNet.Identity;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Globalization;
+using System.IdentityModel.Claims;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Web;
+using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OpenIdConnect;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Owin;
-using System.Security.Claims;
-using System.Threading.Tasks;
+using MVCwithAAD.Models;
 
-namespace MVCwithAAD {
-  public partial class Startup {
-    public void ConfigureAuth(IAppBuilder app) {
+namespace MVCwithAAD
+{
+    public partial class Startup
+    {
+        private static string clientId = ConfigurationManager.AppSettings["ida:ClientId"];
+        private static string appKey = ConfigurationManager.AppSettings["ida:ClientSecret"];
+        private static string aadInstance = ConfigurationManager.AppSettings["ida:AADInstance"];
+        private static string tenantId = ConfigurationManager.AppSettings["ida:TenantId"];
+        private static string postLogoutRedirectUri = ConfigurationManager.AppSettings["ida:PostLogoutRedirectUri"];
 
-      //var cookieType = CookieAuthenticationDefaults.AuthenticationType; //"Cookies";
-      var cookieType = DefaultAuthenticationTypes.ApplicationCookie;
-      //var cookieType = DefaultAuthenticationTypes.ExternalCookie;
+        public static readonly string Authority = aadInstance + tenantId;
 
-      app.UseCookieAuthentication(new CookieAuthenticationOptions {
-        AuthenticationType = cookieType,
-        CookieName = "MVCcookieOIDaad"
-      });
+        // This is the resource ID of the AAD Graph API.  We'll need this to request a token to call the Graph API.
+        string graphResourceId = "https://graph.windows.net/";
 
-      // HYBRID
-      app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions {
-        SignInAsAuthenticationType = cookieType,
+        public void ConfigureAuth(IAppBuilder app)
+        {
+            //ApplicationDbContext db = new ApplicationDbContext();
 
-        Authority = "https://localhost:44334",
-        RequireHttpsMetadata = false,
-        RedirectUri = "http://localhost:58927/signin-oidc",
-        PostLogoutRedirectUri = "http://localhost:58927/signout-callback-oidc",
+            app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
 
-        ClientId = "mvc4netaad.hybrid",
-        ClientSecret = "secret",
-                
-        ResponseType = OpenIdConnectResponseType.CodeIdToken, //"code id_token"
+            app.UseCookieAuthentication(new CookieAuthenticationOptions());
 
-        //Scope = "openid profile email api1 api2.read_only",
-        Scope = "openid profile",
+            app.UseOpenIdConnectAuthentication(
+                new OpenIdConnectAuthenticationOptions
+                {
+                    ClientId = clientId,
+                    Authority = Authority,
+                    PostLogoutRedirectUri = postLogoutRedirectUri,
 
-        //Notifications = new OpenIdConnectAuthenticationNotifications {
-        //  SecurityTokenValidated = notification => {
-        //    notification.AuthenticationTicket.Identity.AddClaim(new Claim("id_token", notification.ProtocolMessage.IdToken));
-        //    //notification.AuthenticationTicket.Identity.AddClaim(new Claim("access_token", notification.ProtocolMessage.AccessToken));
-
-        //    return Task.FromResult(0);
-        //  },
-
-        //  RedirectToIdentityProvider = notification => {
-        //    notification.ProtocolMessage.RedirectUri = notification.OwinContext.Request.Uri.Host;
-        //    notification.ProtocolMessage.PostLogoutRedirectUri = notification.OwinContext.Request.Uri.Host;
-          
-        //    return Task.FromResult(0);
-        //  }
-        //}
-      });
-
-      //RESOURCE OWNER PASSWORD
-      //app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions {
-      //  Authority = "https://localhost:44334",
-      //  ClientId = "webadmin.roclient",
-      //  ClientSecret = "secret",
-      //  ResponseType = "id_token",
-      //  SignInAsAuthenticationType = cookieType,
-      //  RedirectUri = "http://localhost:58927/signin-oidc",
-      //  Scope = "openid"
-      //});
+                    Notifications = new OpenIdConnectAuthenticationNotifications()
+                    {
+                        // If there is a code in the OpenID Connect response, redeem it for an access token and refresh token, and store those away.
+                        AuthorizationCodeReceived = (context) =>
+                        {
+                            var code = context.Code;
+                            ClientCredential credential = new ClientCredential(clientId, appKey);
+                            string signedInUserID = context.AuthenticationTicket.Identity.FindFirst(ClaimTypes.NameIdentifier).Value;
+                            AuthenticationContext authContext = new AuthenticationContext(Authority, new ADALTokenCache(signedInUserID));
+                            return authContext.AcquireTokenByAuthorizationCodeAsync(
+                               code, new Uri(HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Path)), credential, graphResourceId);
+                        }
+                    }
+                });
+        }
     }
-  }
-
 }

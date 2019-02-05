@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 
 namespace MVCwithAAD.Controllers {
+  [System.Web.Mvc.Authorize]
   public class HomeController : Controller {
     public ActionResult Index() {
 
