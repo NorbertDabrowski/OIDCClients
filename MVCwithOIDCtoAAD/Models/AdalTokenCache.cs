@@ -9,13 +9,13 @@ using Microsoft.IdentityModel.Clients.ActiveDirectory;
 
 namespace MVCwithOIDCtoAAD.Models
 {
-    public class ADALTokenCache2 : TokenCache
+    public class ADALTokenCache : TokenCache
     {
         private ApplicationDbContext db = new ApplicationDbContext();
         private string userId;
         private UserTokenCache Cache;
 
-        public ADALTokenCache2(string signedInUserId)
+        public ADALTokenCache(string signedInUserId)
         {
             // Associate the cache to the current user of the web app
             userId = signedInUserId;

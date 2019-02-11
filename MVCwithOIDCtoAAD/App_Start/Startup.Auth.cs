@@ -53,13 +53,14 @@ namespace MVCwithOIDCtoAAD {
         Notifications = new OpenIdConnectAuthenticationNotifications() {
           // If there is a code in the OpenID Connect response, redeem it for an access token and refresh token, and store those away.
           AuthorizationCodeReceived = (context) => {
-            //var code = context.Code;
-            //ClientCredential credential = new ClientCredential(clientId, appKey);
-            //string signedInUserID = context.AuthenticationTicket.Identity.FindFirst(ClaimTypes.NameIdentifier).Value;
-            //AuthenticationContext authContext = new AuthenticationContext(Authority, new ADALTokenCache(signedInUserID));
-            //return authContext.AcquireTokenByAuthorizationCodeAsync(
-            //    code, new Uri(HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Path)), credential, graphResourceId);
-            return Task.Run(() => { });
+            var code = context.Code;
+            ClientCredential credential = new ClientCredential(clientId, appKey);
+            string signedInUserID = context.AuthenticationTicket.Identity.FindFirst(ClaimTypes.NameIdentifier).Value;
+            AuthenticationContext authContext = new AuthenticationContext(Authority, new ADALTokenCache(signedInUserID));
+            return authContext.AcquireTokenByAuthorizationCodeAsync(
+                code, new Uri(HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Path)), credential, graphResourceId);
+
+            //return Task.Run(() => { });
           },
 
           AuthenticationFailed = (context) => {
